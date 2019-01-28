@@ -499,17 +499,20 @@ public class Camera2BasicFragment extends Fragment
    */
   private void setUpCameraOutputs(int width, int height) {
     Activity activity = getActivity();
+    //카메라 매니저 가져오기
     CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
     try {
-      for (String cameraId : manager.getCameraIdList()) {
+      for (String cameraId : manager.getCameraIdList()) { // 사용가능한 카메라들을 가져옴
         CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
         // We don't use a front facing camera in this sample.
+        //전면카메라면 넘어감(안씀)
         Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
         if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
           continue;
         }
 
+        // StreamConfiguratonMap은 CaptureSession을 생성할때 surfaces를 설정하기 위한 출력 포맷 및 사이즈등의 정보를 가지는 클래스
         StreamConfigurationMap map =
             characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         if (map == null) {
@@ -517,6 +520,7 @@ public class Camera2BasicFragment extends Fragment
         }
 
         // // For still image captures, we use the largest available size.
+        // 사용가능한 출력사이즈중 가장 큰 사이즈 선택
         Size largest =
             Collections.max(
                 Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CompareSizesByArea());
@@ -526,6 +530,7 @@ public class Camera2BasicFragment extends Fragment
 
         // Find out if we need to swap dimension to get the preview size relative to sensor
         // coordinate.
+        // 폰이 기울어져있으면 거기에 맞춰서 이미지를 회전하는 코드인 듯 함
         int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         // noinspection ConstantConditions
         /* Orientation of the camera sensor */
